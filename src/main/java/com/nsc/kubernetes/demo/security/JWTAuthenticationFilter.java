@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withClaim("USER_ROLES", roles)
                 .withSubject(((User) auth.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 2000000))
-                .sign(HMAC512("SECRET".getBytes()));
+                .sign(HMAC512("SECRET".getBytes(StandardCharsets.UTF_8)));
         res.addHeader("Authorization", "Bearer " + token);
     }
 }
