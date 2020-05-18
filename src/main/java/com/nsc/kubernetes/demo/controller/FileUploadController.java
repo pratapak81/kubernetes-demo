@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 
 @RestController
-@RequestMapping(path = "/patient-banner/configuration")
+@RequestMapping(path = "/api/v1/patient-banner/configuration")
 public class FileUploadController {
 
     @Autowired
