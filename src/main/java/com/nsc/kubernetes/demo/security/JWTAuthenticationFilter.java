@@ -3,6 +3,7 @@ package com.nsc.kubernetes.demo.security;
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nsc.kubernetes.demo.model.AppUser;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
         try {
-            AppUser appUser = new ObjectMapper().readValue(req.getInputStream(), AppUser.class);
+            AppUser appUser = new AppUser();
+            if ("application/x-www-form-urlencoded".equals(req.getHeader(HttpHeaders.CONTENT_TYPE))) {
+                appUser.setUserId(req.getParameter("userId"));
+                appUser.setPassword(req.getParameter("password"));
+            } else {
+                String data = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+                appUser = new ObjectMapper().readValue(data, AppUser.class);
+            }
             List<GrantedAuthority> grantedAuthorityList = appUser.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                     .distinct().collect(Collectors.toList());
             return authenticationManager.authenticate(
